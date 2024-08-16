@@ -50,7 +50,7 @@ class BatidaServiceTest {
 
         val dateTime = LocalDateTime.parse("2024-08-16T10:00:00")
 
-        assertThrows<BatidaRecordLimitException> {
+        assertThrows<DailyBatidaRecordLimitException> {
             batidaService.record(dateTime)
         }
     }
