@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: pointcontrol
+
+  docker:
+    compose:
+      file: "../compose.yaml"
