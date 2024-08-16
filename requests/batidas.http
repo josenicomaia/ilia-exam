@@ -1,0 +1,8 @@
+POST localhost:8080/batidas
+Content-Type: application/json
+
+{
+  "dataHora": "2018-08-22T09:00:00"
+}
+
+###

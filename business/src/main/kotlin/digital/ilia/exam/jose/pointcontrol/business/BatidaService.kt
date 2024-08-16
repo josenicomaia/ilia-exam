@@ -14,7 +14,7 @@ class BatidaService(private val batidaRepository: BatidaRepository) : BatidaServ
         }
 
         validateIncompleteLunchtime(recordsStack, dateTime)
-        // validação de working day
+        // @TODO: validação de working day
 
         val batida = Batida(id = UUID.randomUUID(), dateTime = dateTime)
         batidaRepository.save(batida)

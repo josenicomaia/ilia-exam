@@ -6,5 +6,5 @@ import java.util.*
 
 interface BatidaRepository {
     fun save(batida: Batida)
-    fun findAllByDate(toLocalDate: LocalDate): Stack<Batida>
+    fun findAllByDate(date: LocalDate): Stack<Batida>
 }

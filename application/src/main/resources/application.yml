@@ -4,4 +4,4 @@ spring:
 
   docker:
     compose:
-      file: "../compose.yaml"
+      file: "./compose.yaml"
