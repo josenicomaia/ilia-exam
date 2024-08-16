@@ -20,7 +20,7 @@ class BatidaServiceTest {
     fun givenAnDateTimeWhenRecordThenSaveIt() {
         every {
             batidaRepository.findAllByDate(LocalDate.parse("2024-08-16"))
-        } returns listOf()
+        } returns Stack()
 
         every {
             batidaRepository.save(any<Batida>())
@@ -38,19 +38,35 @@ class BatidaServiceTest {
     }
 
     @Test
-    fun givenAnAlreadyRecordedFourTimesWhenRecordThenThrowValidationException() {
+    fun givenAnAlreadyRecordedFourTimesWhenRecordThenThrowException() {
         every {
             batidaRepository.findAllByDate(LocalDate.parse("2024-08-16"))
-        } returns listOf(
-            Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")),
-            Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")),
-            Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")),
-            Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")),
-        )
+        } returns Stack<Batida>().apply {
+            push(Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")))
+            push(Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")))
+            push(Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")))
+            push(Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")))
+        }
 
         val dateTime = LocalDateTime.parse("2024-08-16T10:00:00")
 
         assertThrows<DailyBatidaRecordLimitException> {
+            batidaService.record(dateTime)
+        }
+    }
+
+    @Test
+    fun givenAnAlreadyRecordedLeavingForLunchWhenRecordBeforeOneHourBreakThenThrowException() {
+        every {
+            batidaRepository.findAllByDate(LocalDate.parse("2024-08-16"))
+        } returns Stack<Batida>().apply {
+            push(Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")))
+            push(Batida(UUID.randomUUID(), LocalDateTime.parse("2024-08-16T08:00")))
+        }
+
+        val dateTime = LocalDateTime.parse("2024-08-16T08:00:00")
+
+        assertThrows<RecordBatidaBeforeLunchBreakEndException> {
             batidaService.record(dateTime)
         }
     }

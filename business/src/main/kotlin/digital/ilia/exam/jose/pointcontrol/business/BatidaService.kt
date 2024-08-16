@@ -7,18 +7,32 @@ import java.util.*
 
 class BatidaService(private val batidaRepository: BatidaRepository) : BatidaServiceInputPort {
     override fun record(dateTime: LocalDateTime): Batida {
-        val batidaList = batidaRepository.findAllByDate(dateTime.toLocalDate())
+        val recordsStack = batidaRepository.findAllByDate(dateTime.toLocalDate())
 
-        if (batidaList.count() >= 4) {
-            throw BatidaRecordLimitException()
+        if (recordsStack.count() >= 4) {
+            throw DailyBatidaRecordLimitException()
         }
 
-        // validação de 1 hora de almoço
+        validateIncompleteLunchtime(recordsStack, dateTime)
         // validação de working day
 
         val batida = Batida(id = UUID.randomUUID(), dateTime = dateTime)
         batidaRepository.save(batida)
 
         return batida
+    }
+
+    private fun validateIncompleteLunchtime(
+        recordsStack: Stack<Batida>,
+        dateTime: LocalDateTime
+    ) {
+        if (recordsStack.count() == 2) {
+            val lastRecord = recordsStack.peek()
+            val lunchBreakEndDateTime = lastRecord.dateTime.plusHours(1)
+
+            if (dateTime.isBefore(lunchBreakEndDateTime)) {
+                throw RecordBatidaBeforeLunchBreakEndException()
+            }
+        }
     }
 }
